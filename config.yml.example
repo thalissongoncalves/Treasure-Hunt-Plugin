@@ -1,0 +1,96 @@
+# ============================================================
+#   TreasureHunt - config.yml.example
+#   Copie este arquivo para plugins/TreasureHunt/config.yml
+# ============================================================
+
+# Plugin Settings
+plugin:
+  # Prefix shown before every chat message.
+  prefix: "&6[TreasureHunt] &r"
+
+  # Sound played when a player discovers a treasure.
+  enable-treasure-sound: true
+  treasure-sound: "ENTITY_PLAYER_LEVELUP"
+
+  # Particles spawned at the treasure block on discovery.
+  enable-treasure-particles: true
+
+# ============================================================
+# Database (MySQL + HikariCP)
+# ============================================================
+
+database:
+  host: localhost
+  port: 3306
+  database: treasurehunt
+  username: root
+  password: "YOUR_PASSWORD_HERE"
+
+  # Connection pool settings
+  max-pool-size: 10
+  min-pool-size: 5
+  max-lifetime: 1800000
+  idle-timeout: 600000
+
+# ============================================================
+# In-Game Messages
+# Color codes: &a &b &c &d &e &f &0 &1 &2 &3 &4 &5 &6 &7 &8 &9
+# ============================================================
+
+messages:
+
+  # -- Treasure interactions ----------------------------------
+  treasure-found:    "&aYou found a treasure! &8(&6%id%&8)"
+  already-collected: "&cYou have already collected this treasure."
+
+  # -- Admin feedback ----------------------------------------
+  treasure-created:  "&aTreasure &6%id% &acreated successfully."
+  treasure-deleted:  "&aTreasure deleted successfully."
+  delete-confirmed:  "&aTreasure permanently deleted."
+  delete-cancelled:  "&7Deletion cancelled."
+  reload-completed:  "&aTreasures reloaded from the database."
+  waiting-for-block: "&eRight-click a solid block to set the treasure location."
+
+  # -- Errors ------------------------------------------------
+  no-permission:        "&cYou don't have permission to use this command."
+  treasure-not-found:   "&cNo treasure found with ID &6%id%&c."
+  no-treasures:         "&cThere are no treasures registered in the system."
+  duplicate-id:         "&cA treasure with ID &6%id% &calready exists."
+  already-occupied:     "&cAnother treasure is already placed at this location."
+  invalid-block:        "&cYou must click on a solid block."
+  invalid-treasure-id:  "&cInvalid ID - use letters, numbers, hyphens and underscores only."
+  delete-error:         "&cFailed to delete the treasure. Check console for details."
+  no-completions:       "&7No players have completed this treasure yet."
+
+  # -- Usage hints -------------------------------------------
+  usage-create:    "&cUsage: /treasure create <id> <command>"
+  usage-delete:    "&cUsage: /treasure delete <id>"
+  usage-completed: "&cUsage: /treasure completed <id>"
+
+  # -- GUI labels --------------------------------------------
+  delete-confirmation-title: "&cDelete:"
+  delete-confirmation-yes:   "&a+ Confirm"
+  delete-confirmation-no:    "&c- Cancel"
+
+  # -- Search prompt -----------------------------------------
+  search-prompt: "&e[TreasureHunt] &7Type the treasure ID to search, or &ccancel &7to go back:"
+
+  # -- Visual elements ---------------------------------------
+  header-line: "&8&m------------------------------------------------"
+
+  header-list:      "&e Treasures   &8| &7%count% registered"
+  header-completed: "&e Completions &8| &7%count% player(s)"
+  header-help:      "&e TreasureHunt &8| &7Admin Commands"
+
+  list-item: " &6%id%  &8> &7%location%"
+
+  completed-player:  " &a+ &f%player%"
+  completed-unknown: " &7+ %uuid%...  &8(unknown)"
+  completed-invalid: " &7+ Invalid UUID"
+
+  help-create:    " &a/treasure create &7<id> <cmd> &8- &7Create a treasure"
+  help-delete:    " &a/treasure delete &7<id>        &8- &7Delete a treasure"
+  help-completed: " &a/treasure completed &7<id>     &8- &7Show collectors"
+  help-list:      " &a/treasure list                 &8- &7List all treasures"
+  help-gui:       " &a/treasure gui                  &8- &7Open management GUI"
+  help-reload:    " &a/treasure reload               &8- &7Reload from database"

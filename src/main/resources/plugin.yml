@@ -1,0 +1,20 @@
+name: TreasureHunt
+version: 1.0.0
+api-version: 1.13
+main: com.premierstudios.treasurehunt.TreasureHunt
+description: A multi-server treasure hunting plugin with MySQL support
+authors:
+  - Premier Studios
+
+commands:
+  treasure:
+    description: Main TreasureHunt command
+    usage: /treasure <create|delete|completed|list|gui|reload>
+    permission: treasurehunt.admin
+    aliases:
+      - th
+
+permissions:
+  treasurehunt.admin:
+    description: Allows access to all treasure commands
+    default: op
