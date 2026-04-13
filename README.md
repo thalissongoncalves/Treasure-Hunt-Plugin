@@ -1,6 +1,6 @@
 # TreasureHunt
 
-**A modern multi-server treasure hunting plugin for Minecraft Paper 1.21+**
+**A modern multi-server treasure hunting plugin for Minecraft Paper 1.20+**
 
 Administrators can place custom treasures across the world. When a player finds and clicks a treasure block, a configurable command is executed from console. Each treasure can be collected only **once per player**, even across multiple servers sharing the same MySQL database.
 
