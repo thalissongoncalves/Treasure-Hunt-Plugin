@@ -1,7 +1,6 @@
 package com.premierstudios.treasurehunt.database;
 
 import com.premierstudios.treasurehunt.config.ConfigManager;
-import com.premierstudios.treasurehunt.treasure.LocationSerializer;
 import com.premierstudios.treasurehunt.treasure.Treasure;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -30,7 +29,7 @@ public class DatabaseManager {
     /**
      * Creates a new DatabaseManager instance.
      *
-     * @param plugin the TreasureHunt plugin instance
+     * @param plugin        the TreasureHunt plugin instance
      * @param configManager the configuration manager
      */
     public DatabaseManager(JavaPlugin plugin, ConfigManager configManager) {
@@ -50,8 +49,7 @@ public class DatabaseManager {
                     "jdbc:mysql://%s:%d/%s",
                     configManager.getDatabaseHost(),
                     configManager.getDatabasePort(),
-                    configManager.getDatabaseName()
-            ));
+                    configManager.getDatabaseName()));
             config.setUsername(configManager.getDatabaseUsername());
             config.setPassword(configManager.getDatabasePassword());
             config.setMaximumPoolSize(configManager.getMaxPoolSize());
@@ -103,7 +101,7 @@ public class DatabaseManager {
         String sql = "INSERT INTO treasures (id, command, world, x, y, z) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasure.getId());
             stmt.setString(2, treasure.getCommand());
@@ -132,7 +130,7 @@ public class DatabaseManager {
         String sql = "DELETE FROM treasures WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasureId);
             int affectedRows = stmt.executeUpdate();
@@ -159,8 +157,8 @@ public class DatabaseManager {
         String sql = "SELECT id, command, world, x, y, z, created_at FROM treasures";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 String id = rs.getString("id");
@@ -175,8 +173,7 @@ public class DatabaseManager {
                         org.bukkit.Bukkit.getWorld(world),
                         x + 0.5,
                         y,
-                        z + 0.5
-                );
+                        z + 0.5);
 
                 treasures.add(new Treasure(id, command, location, createdAt));
             }
@@ -200,7 +197,7 @@ public class DatabaseManager {
         String sql = "SELECT id, command, world, x, y, z, created_at FROM treasures WHERE id = ?";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasureId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -217,8 +214,7 @@ public class DatabaseManager {
                             org.bukkit.Bukkit.getWorld(world),
                             x + 0.5,
                             y,
-                            z + 0.5
-                    );
+                            z + 0.5);
 
                     return new Treasure(id, command, location, createdAt);
                 }
@@ -242,7 +238,7 @@ public class DatabaseManager {
         String sql = "INSERT IGNORE INTO treasure_completed (treasure_id, player_uuid) VALUES (?, ?)";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasureId);
             stmt.setString(2, playerUuid);
@@ -261,13 +257,14 @@ public class DatabaseManager {
      *
      * @param treasureId the ID of the treasure
      * @param playerUuid the UUID of the player
-     * @return true if the treasure was already completed by the player, false otherwise
+     * @return true if the treasure was already completed by the player, false
+     *         otherwise
      */
     public boolean isTreasureCompleted(String treasureId, String playerUuid) {
         String sql = "SELECT 1 FROM treasure_completed WHERE treasure_id = ? AND player_uuid = ? LIMIT 1";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasureId);
             stmt.setString(2, playerUuid);
@@ -293,7 +290,7 @@ public class DatabaseManager {
         String sql = "SELECT player_uuid FROM treasure_completed WHERE treasure_id = ? ORDER BY completed_at DESC";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasureId);
 
@@ -321,7 +318,7 @@ public class DatabaseManager {
         String sql = "SELECT 1 FROM treasures WHERE id = ? LIMIT 1";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, treasureId);
 
@@ -346,7 +343,7 @@ public class DatabaseManager {
         String sql = "SELECT 1 FROM treasures WHERE world = ? AND x = ? AND y = ? AND z = ? LIMIT 1";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, location.getWorld().getName());
             stmt.setInt(2, location.getBlockX());
@@ -374,7 +371,7 @@ public class DatabaseManager {
         String sql = "SELECT id, command, world, x, y, z, created_at FROM treasures WHERE world = ? AND x = ? AND y = ? AND z = ?";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, location.getWorld().getName());
             stmt.setInt(2, location.getBlockX());
@@ -395,8 +392,7 @@ public class DatabaseManager {
                             org.bukkit.Bukkit.getWorld(world),
                             x + 0.5,
                             y,
-                            z + 0.5
-                    );
+                            z + 0.5);
 
                     return new Treasure(id, command, treasureLocation, createdAt);
                 }

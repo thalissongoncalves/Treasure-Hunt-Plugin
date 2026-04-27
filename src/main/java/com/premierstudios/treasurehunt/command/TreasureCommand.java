@@ -11,23 +11,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Handles all /treasure subcommands: create, delete, completed, list, gui, reload.
- */
 public class TreasureCommand implements CommandExecutor {
 
+    private final JavaPlugin plugin;
     private final TreasureManager treasureManager;
     private final ConfigManager configManager;
     private final TreasureGUI treasureGUI;
     private final Map<UUID, PendingTreasure> pendingTreasures;
 
-    public TreasureCommand(TreasureManager treasureManager, ConfigManager configManager,
+    public TreasureCommand(JavaPlugin plugin, TreasureManager treasureManager, ConfigManager configManager,
                            TreasureGUI treasureGUI, Map<UUID, PendingTreasure> pendingTreasures) {
+        this.plugin = plugin;
         this.treasureManager = treasureManager;
         this.configManager = configManager;
         this.treasureGUI = treasureGUI;
@@ -137,32 +137,37 @@ public class TreasureCommand implements CommandExecutor {
             return true;
         }
 
-        List<String> completions = treasureManager.getTreasureCompletions(id);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            List<String> completions = treasureManager.getTreasureCompletions(id);
 
-        if (completions.isEmpty()) {
-            MessageUtil.sendMessage(player, configManager.getMessage("no-completions"));
-            return true;
-        }
-
-        sendLine(player);
-        MessageUtil.sendMessage(player, configManager.getMessage("header-completed", "count", completions.size()));
-        sendLine(player);
-
-        for (String uuid : completions) {
-            try {
-                org.bukkit.OfflinePlayer op = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
-                String name = op.getName();
-                if (name != null && !name.isEmpty()) {
-                    MessageUtil.sendMessage(player, configManager.getMessage("completed-player", "player", name));
-                } else {
-                    MessageUtil.sendMessage(player, configManager.getMessage("completed-unknown", "uuid", uuid.substring(0, 8)));
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (completions.isEmpty()) {
+                    MessageUtil.sendMessage(player, configManager.getMessage("no-completions"));
+                    return;
                 }
-            } catch (IllegalArgumentException e) {
-                MessageUtil.sendMessage(player, configManager.getMessage("completed-invalid"));
-            }
-        }
 
-        sendLine(player);
+                sendLine(player);
+                MessageUtil.sendMessage(player, configManager.getMessage("header-completed", "count", completions.size()));
+                sendLine(player);
+
+                for (String uuid : completions) {
+                    try {
+                        org.bukkit.OfflinePlayer op = Bukkit.getOfflinePlayer(UUID.fromString(uuid));
+                        String name = op.getName();
+                        if (name != null && !name.isEmpty()) {
+                            MessageUtil.sendMessage(player, configManager.getMessage("completed-player", "player", name));
+                        } else {
+                            MessageUtil.sendMessage(player, configManager.getMessage("completed-unknown", "uuid", uuid.substring(0, 8)));
+                        }
+                    } catch (IllegalArgumentException e) {
+                        MessageUtil.sendMessage(player, configManager.getMessage("completed-invalid"));
+                    }
+                }
+
+                sendLine(player);
+            });
+        });
+
         return true;
     }
 
@@ -196,8 +201,9 @@ public class TreasureCommand implements CommandExecutor {
     }
 
     private boolean handleReload(Player player) {
-        treasureManager.reload();
-        MessageUtil.sendMessage(player, configManager.getMessage("reload-completed"));
+        treasureManager.reloadAsync(() ->
+            MessageUtil.sendMessage(player, configManager.getMessage("reload-completed"))
+        );
         return true;
     }
 

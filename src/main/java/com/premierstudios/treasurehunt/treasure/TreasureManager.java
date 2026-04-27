@@ -1,6 +1,7 @@
 package com.premierstudios.treasurehunt.treasure;
 
 import com.premierstudios.treasurehunt.database.DatabaseManager;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,7 +14,8 @@ public class TreasureManager {
 
     private final JavaPlugin plugin;
     private final DatabaseManager db;
-    // Dual cache: one by ID for fast lookup, one by location for block hit detection
+    // Dual cache: one by ID for fast lookup, one by location for block hit
+    // detection
     private final Map<String, Treasure> byId = new HashMap<>();
     private final Map<String, Treasure> byLocation = new HashMap<>();
 
@@ -25,8 +27,24 @@ public class TreasureManager {
     public void reload() {
         byId.clear();
         byLocation.clear();
-        for (Treasure t : db.loadAllTreasures()) cache(t);
+        for (Treasure t : db.loadAllTreasures())
+            cache(t);
         plugin.getLogger().info("Loaded " + byId.size() + " treasures.");
+    }
+
+    public void reloadAsync(Runnable callback) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            List<Treasure> loaded = db.loadAllTreasures();
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                byId.clear();
+                byLocation.clear();
+                for (Treasure t : loaded)
+                    cache(t);
+                plugin.getLogger().info("Loaded " + byId.size() + " treasures.");
+                if (callback != null)
+                    callback.run();
+            });
+        });
     }
 
     private void cache(Treasure t) {
@@ -36,7 +54,8 @@ public class TreasureManager {
 
     private void uncache(String id) {
         Treasure t = byId.remove(id);
-        if (t != null) byLocation.remove(LocationSerializer.serialize(t.getLocation()));
+        if (t != null)
+            byLocation.remove(LocationSerializer.serialize(t.getLocation()));
     }
 
     public boolean createTreasure(String id, String command, Location location) {
@@ -80,8 +99,10 @@ public class TreasureManager {
     public List<Treasure> getAllTreasuresSorted() {
         List<Treasure> list = new ArrayList<>(byId.values());
         list.sort((a, b) -> {
-            if (a.getCreatedAt() == null) return 1;
-            if (b.getCreatedAt() == null) return -1;
+            if (a.getCreatedAt() == null)
+                return 1;
+            if (b.getCreatedAt() == null)
+                return -1;
             return a.getCreatedAt().compareTo(b.getCreatedAt());
         });
         return list;
@@ -91,7 +112,8 @@ public class TreasureManager {
         String q = query.toLowerCase();
         List<Treasure> results = new ArrayList<>();
         for (Treasure t : byId.values())
-            if (t.getId().toLowerCase().contains(q)) results.add(t);
+            if (t.getId().toLowerCase().contains(q))
+                results.add(t);
         results.sort((a, b) -> a.getId().compareToIgnoreCase(b.getId()));
         return results;
     }

@@ -72,9 +72,6 @@ messages:
   delete-confirmation-yes:   "&a+ Confirm"
   delete-confirmation-no:    "&c- Cancel"
 
-  # -- Search prompt -----------------------------------------
-  search-prompt: "&e[TreasureHunt] &7Type the treasure ID to search, or &ccancel &7to go back:"
-
   # -- Visual elements ---------------------------------------
   # &8&m produces a dark-gray strikethrough line. Hyphens are plain ASCII
   # and render identically on every Minecraft client and version.

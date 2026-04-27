@@ -78,6 +78,7 @@ public class TreasureHunt extends JavaPlugin {
      */
     private void registerCommands() {
         TreasureCommand treasureCommand = new TreasureCommand(
+                this,
                 treasureManager,
                 configManager,
                 treasureGUI,
