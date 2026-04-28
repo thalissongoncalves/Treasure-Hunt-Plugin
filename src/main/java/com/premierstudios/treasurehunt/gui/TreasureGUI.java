@@ -247,14 +247,17 @@ public class TreasureGUI implements Listener {
         if (id == null) return;
 
         if (e.getSlot() == 10) {
-            if (manager.deleteTreasure(id)) {
-                MessageUtil.sendMessage(p, config.getMessage("delete-confirmed"));
-                plugin.getLogger().info("Treasure '" + id + "' deleted by " + p.getName());
-            } else {
-                MessageUtil.sendMessage(p, config.getMessage("delete-error"));
-            }
+            int page = playerPages.getOrDefault(uuid, 1);
             pendingDelete.remove(uuid);
-            openInventory(p, playerPages.getOrDefault(uuid, 1));
+            manager.deleteAsync(id, success -> {
+                if (success) {
+                    MessageUtil.sendMessage(p, config.getMessage("delete-confirmed"));
+                    plugin.getLogger().info("Treasure '" + id + "' deleted by " + p.getName());
+                } else {
+                    MessageUtil.sendMessage(p, config.getMessage("delete-error"));
+                }
+                openInventory(p, page);
+            });
         } else if (e.getSlot() == 16) {
             MessageUtil.sendMessage(p, config.getMessage("delete-cancelled"));
             pendingDelete.remove(uuid);

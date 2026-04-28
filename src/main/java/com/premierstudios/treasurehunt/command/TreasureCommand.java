@@ -116,11 +116,12 @@ public class TreasureCommand implements CommandExecutor {
             return true;
         }
 
-        if (treasureManager.deleteTreasure(id)) {
-            MessageUtil.sendMessage(player, configManager.getMessage("treasure-deleted"));
-        } else {
-            MessageUtil.sendMessage(player, configManager.getMessage("delete-error"));
-        }
+        treasureManager.deleteAsync(id, success -> {
+            if (success)
+                MessageUtil.sendMessage(player, configManager.getMessage("treasure-deleted"));
+            else
+                MessageUtil.sendMessage(player, configManager.getMessage("delete-error"));
+        });
         return true;
     }
 

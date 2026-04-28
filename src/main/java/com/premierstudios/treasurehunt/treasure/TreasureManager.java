@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class TreasureManager {
 
@@ -76,6 +77,28 @@ public class TreasureManager {
         return false;
     }
 
+    public void createAsync(String id, String command, Location location, Consumer<Boolean> callback) {
+        if (byId.containsKey(id)) {
+            plugin.getLogger().warning("Treasure ID '" + id + "' already exists.");
+            if (callback != null) callback.accept(false);
+            return;
+        }
+        if (isTreasureAtLocation(location)) {
+            plugin.getLogger().warning("A treasure already exists at this location.");
+            if (callback != null) callback.accept(false);
+            return;
+        }
+
+        Treasure t = new Treasure(id, command, location, java.time.LocalDateTime.now());
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            boolean saved = db.saveTreasure(t);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (saved) cache(t);
+                if (callback != null) callback.accept(saved);
+            });
+        });
+    }
+
     public boolean deleteTreasure(String id) {
         if (!byId.containsKey(id)) {
             plugin.getLogger().warning("Treasure '" + id + "' not found in cache.");
@@ -86,6 +109,21 @@ public class TreasureManager {
             return true;
         }
         return false;
+    }
+
+    public void deleteAsync(String id, Consumer<Boolean> callback) {
+        if (!byId.containsKey(id)) {
+            plugin.getLogger().warning("Treasure '" + id + "' not found in cache.");
+            if (callback != null) callback.accept(false);
+            return;
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            boolean deleted = db.deleteTreasure(id);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                if (deleted) uncache(id);
+                if (callback != null) callback.accept(deleted);
+            });
+        });
     }
 
     public Treasure getTreasure(String id) {

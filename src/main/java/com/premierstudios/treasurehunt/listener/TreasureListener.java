@@ -100,22 +100,24 @@ public class TreasureListener implements Listener {
             return;
         }
 
-        boolean created = treasureManager.createTreasure(
+        // Remove before async so a second click while the query runs doesn't trigger again
+        pendingTreasures.remove(playerUuid);
+
+        treasureManager.createAsync(
                 pending.getTreasureId(),
                 pending.getCommand(),
-                event.getClickedBlock().getLocation()
+                event.getClickedBlock().getLocation(),
+                success -> {
+                    if (success) {
+                        MessageUtil.sendMessage(event.getPlayer(),
+                                configManager.getMessage("treasure-created", "id", pending.getTreasureId()));
+                        plugin.getLogger().info("Treasure '" + pending.getTreasureId()
+                                + "' created by " + event.getPlayer().getName());
+                    } else {
+                        MessageUtil.sendMessage(event.getPlayer(), configManager.getMessage("already-occupied"));
+                    }
+                }
         );
-
-        if (created) {
-            MessageUtil.sendMessage(event.getPlayer(),
-                    configManager.getMessage("treasure-created", "id", pending.getTreasureId()));
-            plugin.getLogger().info("Treasure '" + pending.getTreasureId()
-                    + "' created by " + event.getPlayer().getName());
-        } else {
-            MessageUtil.sendMessage(event.getPlayer(), configManager.getMessage("already-occupied"));
-        }
-
-        pendingTreasures.remove(playerUuid);
     }
 
     // -------------------------------------------------------------------------
